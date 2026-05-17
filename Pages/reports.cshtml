@@ -1,4 +1,5 @@
 @page
+@model BleachedForums.Pages.ReportsModel
 @{
     Layout = null;
 }
@@ -25,7 +26,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        /* Custom stylings to match the PDF color blocks precisely */
         .metric-card {
             border-radius: 6px;
             padding: 1.5rem 1rem;
@@ -41,19 +41,10 @@
             font-size: 2rem;
             font-weight: 700;
         }
-        .bg-custom-blue {
-            background-color: #0d6efd;
-        }
-        .bg-custom-yellow {
-            background-color: #ffc107;
-            color: #212529; /* Dark text for yellow readability */
-        }
-        .bg-custom-green {
-            background-color: #198754;
-        }
-        .bg-custom-red {
-            background-color: #dc3545;
-        }
+        .bg-custom-blue { background-color: #0d6efd; }
+        .bg-custom-yellow { background-color: #ffc107; color: #212529; }
+        .bg-custom-green { background-color: #198754; }
+        .bg-custom-red { background-color: #dc3545; }
         .table th {
             font-weight: 600;
             color: #495057;
@@ -78,7 +69,7 @@
                         <a class="nav-link active" aria-current="page" href="reports">Reports</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="user-management">User Management</a>
+                        <a class="nav-link" href="user-management">User Management</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="about">About</a>
@@ -92,45 +83,61 @@
     </nav>
 
     <div class="container my-5 flex-grow-1">
-        <div class="row mb-4">
-            <div class="col-12">
+        <div class="row mb-4 align-items-center">
+            <div class="col-sm-6">
                 <h1 class="fw-normal text-dark">System Reports</h1>
             </div>
+            <!-- Export button setup for the upcoming Excel assignment module -->
+            <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
+    <div class="dropdown d-inline-block">
+        <button class="btn btn-success dropdown-toggle d-inline-flex align-items-center" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-file-earmark-excel me-2"></i> Export Report Template
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton">
+            <li><h6 class="dropdown-header">Select 1 of 3 System Layouts</h6></li>
+            <li><a class="dropdown-item" href="#" onclick="triggerExcelDownload('tickets')"><i class="bi bi-ticket-perforated me-2 text-warning"></i> Support Tickets Template</a></li>
+            <li><a class="dropdown-item" href="#" onclick="triggerExcelDownload('users')"><i class="bi bi-people me-2 text-primary"></i> User Registrations Template</a></li>
+            <li><a class="dropdown-item" href="#" onclick="triggerExcelDownload('threads')"><i class="bi bi-chat-square-text me-2 text-success"></i> Forum Threads Template</a></li>
+        </ul>
+    </div>
+</div>
         </div>
 
+        <!-- LIVE METRICS CARD DISPLAY BLOCK -->
         <div class="row g-4 mb-5">
             <div class="col-md-3">
                 <div class="metric-card bg-custom-blue">
                     <div class="metric-title">Total Users</div>
-                    <div class="metric-value">1,240</div>
+                    <div class="metric-value">@Model.TotalUsers.ToString("N0")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="metric-card bg-custom-yellow">
                     <div class="metric-title">Pending Tickets</div>
-                    <div class="metric-value">14</div>
+                    <div class="metric-value">@Model.PendingTickets.ToString("N0")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="metric-card bg-custom-green">
-                    <div class="metric-title">Total Posts</div>
-                    <div class="metric-value">5,602</div>
+                    <div class="metric-title">Total Threads</div>
+                    <div class="metric-value">@Model.TotalThreads.ToString("N0")</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="metric-card bg-custom-red">
-                    <div class="metric-title">Flagged Posts</div>
-                    <div class="metric-value">8</div>
+                    <div class="metric-title">Flagged Threads</div>
+                    <div class="metric-value">@Model.LockedThreads.ToString("N0")</div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
+            <!-- DATA GRID LOGICAL WRAPPER -->
             <div class="col-lg-7">
                 <div class="card p-4 h-100">
                     <h5 class="fw-bold mb-4 text-dark fs-6">Recent Support Tickets</h5>
                     <div class="table-responsive">
-                        <table class="table align-middle">
+                        <table class="table align-middle table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -140,45 +147,69 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="text-muted">#882</td>
-                                    <td>Technical</td>
-                                    <td><span class="text-danger">High</span></td>
-                                    <td><span class="badge bg-primary text-white">Open</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="text-muted">#881</td>
-                                    <td>Billing</td>
-                                    <td><span class="text-muted">Low</span></td>
-                                    <td><span class="badge bg-secondary text-white">Closed</span></td>
-                                </tr>
+                                @if (Model.RecentTickets != null && Model.RecentTickets.Any())
+                                {
+                                    foreach (var ticket in Model.RecentTickets)
+                                    {
+                                        <tr>
+                                            <td class="text-muted fw-bold">#@ticket.TicketID</td>
+                                            <td class="text-capitalize">@ticket.Type</td>
+                                            <td>
+                                                @{
+                                                    var pColor = ticket.Priority == "urgent" || ticket.Priority == "high" ? "text-danger fw-bold" : "text-muted";
+                                                }
+                                                <span class="@pColor text-capitalize">@ticket.Priority</span>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var badgeColor = ticket.Status == "resolved" || ticket.Status == "closed" ? "bg-secondary" : "bg-primary";
+                                                }
+                                                <span class="badge @badgeColor text-white text-capitalize">@ticket.Status.Replace("_", " ")</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">No structural ticket logs reported inside database.</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- STATUS DISTRIBUTION DISPLAY BREAKDOWN -->
             <div class="col-lg-5">
                 <div class="card p-4 h-100">
                     <h5 class="fw-bold mb-4 text-dark fs-6">User Status Distribution</h5>
                     <div class="d-flex flex-column gap-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Active Users</span>
-                            <span class="badge rounded-pill bg-success px-3 py-2">1,150</span>
+                            <span class="badge rounded-pill bg-success px-3 py-2">@Model.ActiveUsers.ToString("N0")</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Suspended</span>
-                            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">65</span>
+                            <span class="badge rounded-pill bg-warning text-dark px-3 py-2">@Model.SuspendedUsers.ToString("N0")</span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="col-flex d-flex justify-content-between align-items-center">
                             <span class="text-muted">Banned</span>
-                            <span class="badge rounded-pill bg-danger px-3 py-2">25</span>
+                            <span class="badge rounded-pill bg-danger px-3 py-2">@Model.BannedUsers.ToString("N0")</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function triggerExcelDownload(templateType) {
+    // Simply route the browser window anchor thread directly to the custom download pipeline stream route
+    window.location.href = `/api/reports/export?type=${templateType}`;
+}
+    </script>
 </body>
 </html>
