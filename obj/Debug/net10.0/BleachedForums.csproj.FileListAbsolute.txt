@@ -230,3 +230,12 @@ C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\obj\Debug\
 C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\obj\Debug\net10.0\BleachedForums.pdb
 C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\obj\Debug\net10.0\BleachedForums.genruntimeconfig.cache
 C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\obj\Debug\net10.0\ref\BleachedForums.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\obj\Debug\net10.0\BleachedForums.sourcelink.json
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\EPPlus.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\EPPlus.Interfaces.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\System.Drawing.Common.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\System.Private.Windows.Core.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\System.Private.Windows.GdiPlus.dll
+C:\Users\Administrator\Desktop\temp\bleachedforums-git\BleachedForums\bin\Debug\net10.0\runtimes\win\lib\net10.0\Microsoft.Win32.SystemEvents.dll

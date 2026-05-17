@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.5.4" />
     <PackageReference Include="MySql.Data" Version="9.7.0" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.8" />
   </ItemGroup>
 
 </Project>
