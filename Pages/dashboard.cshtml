@@ -1,4 +1,6 @@
 @page
+@model BleachedForums.Pages.DashboardModel
+@using System.Text.Encodings.Web
 @{
     Layout = null;
 }
@@ -51,7 +53,7 @@
                         <a class="nav-link" href="reports">Reports</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="user-management">User Management</a>
+                        <a class="nav-link" href="user-management">User Management</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="about">About</a>
@@ -77,9 +79,9 @@
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold mb-0 text-dark">Forum Threads</h5>
-                        <button class="btn btn-primary btn-sm d-flex align-items-center">
+                        <!--<button class="btn btn-primary btn-sm d-flex align-items-center">
                             <i class="bi bi-plus-lg me-1"></i> New Thread
-                        </button>
+                        </button>-->
                     </div>
                     <div class="table-responsive">
                         <table class="table align-middle table-hover">
@@ -94,32 +96,54 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>101</td>
-                                    <td class="fw-semibold">Welcome to the Lab Forum</td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary px-2">Gen (1)</span></td>
-                                    <td><span class="badge bg-success-subtle text-success">Open</span></td>
-                                    <td><i class="bi bi-pin-angle-fill text-primary"></i></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-secondary">Edit</button>
-                                            <button class="btn btn-outline-danger">Archive</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>102</td>
-                                    <td class="fw-semibold">GPU Drivers crashing on Windows 11</td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary px-2">Tech (3)</span></td>
-                                    <td><span class="badge bg-success-subtle text-success">Open</span></td>
-                                    <td><span class="text-muted">—</span></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-secondary">Edit</button>
-                                            <button class="btn btn-outline-danger">Archive</button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @if (Model.Threads != null && Model.Threads.Any())
+                                {
+                                    foreach (var thread in Model.Threads)
+                                    {
+                                        <tr>
+                                            <td>@thread.ThreadID</td>
+                                            <td class="fw-semibold">@thread.Title</td>
+                                            <td>
+                                                <span class="badge bg-secondary-subtle text-secondary px-2">
+                                                    Cat (@thread.CategoryID)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var threadStatusClass = thread.Status == "open" ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary";
+                                                }
+                                                <span class="badge @threadStatusClass text-capitalize">@thread.Status</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-link p-0" onclick="togglePin('@thread.ThreadID', '@thread.IsPinned.ToString().ToLower()')">
+                                                    @if (thread.IsPinned)
+                                                    {
+                                                        <i class="bi bi-pin-angle-fill text-primary"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-pin-angle text-muted"></i>
+                                                    }
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+    <button class="btn btn-outline-secondary" 
+            onclick="openEditThreadModal('@thread.ThreadID', '@Html.Raw(JavaScriptEncoder.Default.Encode(thread.Title))', '@thread.CategoryID', '@thread.Status')">
+        Edit
+    </button>
+    <button class="btn btn-outline-danger" onclick="archiveThread('@thread.ThreadID')">Archive</button>
+</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-3">No forum threads found in database.</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -130,7 +154,7 @@
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold mb-0 text-dark">Support Tickets</h5>
-                        <button class="btn btn-outline-dark btn-sm">Active Tickets</button>
+                        <!--<button class="btn btn-outline-dark btn-sm">Active Tickets</button>-->
                     </div>
                     <div class="table-responsive">
                         <table class="table align-middle table-hover">
@@ -145,29 +169,48 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="fw-bold">#882</td>
-                                    <td class="text-capitalize">Technical</td>
-                                    <td><span class="badge bg-danger">Urgent</span></td>
-                                    <td><span class="badge bg-info text-dark">Open</span></td>
-                                    <td class="fw-semibold text-secondary">45</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-success">Resolve</button>
-                                            <button class="btn btn-outline-secondary">View Details</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">#885</td>
-                                    <td class="text-capitalize">Account</td>
-                                    <td><span class="badge bg-secondary">Medium</span></td>
-                                    <td><span class="badge bg-secondary-subtle text-secondary">Closed</span></td>
-                                    <td class="fw-semibold text-secondary">12</td>
-                                    <td>
-                                        <button class="btn btn-outline-secondary btn-sm">View Details</button>
-                                    </td>
-                                </tr>
+                                @if (Model.Tickets != null && Model.Tickets.Any())
+                                {
+                                    foreach (var ticket in Model.Tickets)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">#@ticket.TicketID</td>
+                                            <td class="text-capitalize">@ticket.Type</td>
+                                            <td>
+                                                @{
+                                                    var priorityClass = ticket.Priority == "urgent" ? "bg-danger" : 
+                                                                        ticket.Priority == "high" ? "bg-orange text-white" : 
+                                                                        ticket.Priority == "medium" ? "bg-secondary" : "bg-light text-dark";
+                                                }
+                                                <span class="badge @priorityClass text-capitalize">@ticket.Priority</span>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var ticketStatusClass = ticket.Status == "open" || ticket.Status == "in_progress" ? "bg-info text-dark" : "bg-secondary-subtle text-secondary";
+                                                }
+                                                <span class="badge @ticketStatusClass text-replace">@ticket.Status.Replace("_", " ")</span>
+                                            </td>
+                                            <td class="fw-semibold text-secondary">@ticket.UserID</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    @if (ticket.Status != "resolved" && ticket.Status != "closed")
+                                                    {
+                                                        <button class="btn btn-success" onclick="resolveTicket('@ticket.TicketID')">Resolve</button>
+                                                    }
+                                                    <button class="btn btn-outline-primary btn-sm" onclick="openTicketDetails(@ticket.TicketID)">
+                                                        <i class="bi bi-eye me-1"></i> View Details
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-3">No active tickets found in database.</td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -175,6 +218,249 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="ticketDetailsModal" tabindex="-1" aria-labelledby="ticketDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="ticketDetailsModalLabel">
+                        <i class="bi bi-ticket-detailed me-2"></i> Ticket Support Log #<span id="mdlTicketID"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-shadow="none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block">Submitted By (User ID)</small>
+                            <span id="mdlUserID" class="fw-bold text-dark">-</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block">Assigned Admin</small>
+                            <span id="mdlAdminID" class="badge bg-light text-dark border">-</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block">Category Type</small>
+                            <span id="mdlType" class="text-capitalize fw-semibold text-dark">-</span>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <small class="text-muted d-block">Priority Ranking</small>
+                            <span id="mdlPriority" class="text-capitalize fw-semibold">-</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Full Issue Explanation</label>
+                        <div class="p-3 border rounded bg-light text-secondary" id="mdlDetails" style="white-space: pre-wrap; max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close Window</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="editThreadModal" tabindex="-1" aria-labelledby="editThreadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="editThreadModalLabel">
+                    <i class="bi bi-pencil-square me-2"></i> Edit Forum Thread Configuration
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editThreadForm" onsubmit="submitThreadEdit(event)">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="editThreadId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">THREAD TITLE</label>
+                        <input type="text" id="editThreadTitle" class="form-control" required />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">ASSIGNED CATEGORY</label>
+                        <select id="editThreadCategory" class="form-select" required>
+                            <!-- Options filled dynamically by JS -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+    <label class="form-label text-muted small fw-bold">MODERATION STATUS</label>
+    <select id="editThreadStatus" class="form-select" required>
+        <option value="open">Open</option>
+        <option value="locked">Locked</option>
+        <option value="pending">Pending Approval</option>
+        <option value="hidden">Hidden / Moderated</option>
+        <option value="archived">Archived</option>
+    </select>
+</div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let ticketModal = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            ticketModal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+        });
+
+        function archiveThread(threadId) {
+            if (!confirm("Are you sure you want to archive this thread?")) return;
+            const formData = new FormData();
+            formData.append("threadId", threadId);
+            fetch("/api/threads/archive", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error archiving thread: " + data.message);
+                }
+            });
+        }
+
+        var canClickPin = true;
+        function togglePin(threadId, currentPinStatus) {
+            if (!canClickPin) return;
+            canClickPin = false;
+            const formData = new FormData();
+            formData.append("threadId", threadId);
+            formData.append("currentPin", currentPinStatus);
+            fetch("/api/threads/toggle-pin", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error changing pin status: " + data.message);
+                    canClickPin = true;
+                }
+            })
+            .catch(() => { canClickPin = true; });
+        }
+
+        function resolveTicket(ticketId) {
+            const formData = new FormData();
+            formData.append("ticketId", ticketId);
+            fetch("/api/tickets/resolve", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error resolving ticket: " + data.message);
+                }
+            });
+        }
+
+        function openTicketDetails(ticketId) {
+            fetch(`/api/tickets/details?id=${ticketId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Could not extract record trace variables.");
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('mdlTicketID').innerText = data.ticketID;
+                    document.getElementById('mdlUserID').innerText = data.userID;
+                    document.getElementById('mdlAdminID').innerText = data.adminID ? `Admin #${data.adminID}` : "Unassigned";
+                    document.getElementById('mdlType').innerText = data.type;
+                    document.getElementById('mdlDetails').innerText = data.details;
+                    
+                    const priorityEl = document.getElementById('mdlPriority');
+                    priorityEl.innerText = data.priority;
+                    priorityEl.className = (data.priority === 'high' || data.priority === 'urgent') 
+                        ? 'text-danger fw-bold text-capitalize' 
+                        : 'text-muted text-capitalize';
+
+                    ticketModal.show();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Error loading specific support ticket data log profiles.");
+                });
+        }
+
+    let editThreadModal = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Initialize both modals cleanly on page load
+    ticketModal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+    editThreadModal = new bootstrap.Modal(document.getElementById('editThreadModal'));
+});
+
+function openEditThreadModal(threadId, title, currentCategoryId, currentStatus) {
+    document.getElementById('editThreadId').value = threadId;
+    document.getElementById('editThreadTitle').value = title;
+    document.getElementById('editThreadStatus').value = currentStatus;
+
+    const categorySelect = document.getElementById('editThreadCategory');
+    categorySelect.innerHTML = '<option value="">Loading categories...</option>';
+
+    // Fetch live data from the category table to populate dropdown selection options
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(categories => {
+            categorySelect.innerHTML = '';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.categoryID;
+                opt.innerText = cat.name;
+                if(cat.categoryID == currentCategoryId) {
+                    opt.selected = true;
+                }
+                categorySelect.appendChild(opt);
+            });
+            editThreadModal.show();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Failed to load forum categories table profiles.");
+        });
+}
+
+function submitThreadEdit(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append("threadId", document.getElementById('editThreadId').value);
+    formData.append("title", document.getElementById('editThreadTitle').value);
+    formData.append("categoryId", document.getElementById('editThreadCategory').value);
+    formData.append("status", document.getElementById('editThreadStatus').value);
+
+    fetch('/api/threads/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert("Error updating thread entry logs: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Server transmission failure during record alteration updates.");
+    });
+}
+    </script>
 </body>
 </html>
